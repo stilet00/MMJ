@@ -89,26 +89,45 @@ const images = Object.entries(modules)
   padding: 0 1.5rem 2rem;
 }
 .image-card {
+  display: flex;
+  flex-direction: column;
   background: white;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  text-align: center;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .image-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);
 }
+
+/* сам контейнер картинки — пусть растягивается по ширине, а высота определяется пропорциями */
 .image-card img {
   width: 100%;
   height: auto;
   display: block;
 }
+
+/* подпись приклеиваем к низу карточки */
 .image-card p {
-  margin: 0.5rem 0 1rem;
-  font-weight: 500;
-  color: #333;
+  margin: 0;
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #6b46c1 0%, #b794f4 100%);
+  color: white;
+  display: block;
+  width: 100%;                /* чтобы бэдж занимал всю ширину карточки */
+  box-sizing: border-box;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+.image-card:hover p {
+  background: linear-gradient(135deg, #5a3ea1 0%, #9f7aea 100%);
 }
 
 /* mobile tweaks */
