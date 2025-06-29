@@ -1,18 +1,20 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import background from '../assets/background.svg';
+import Layout from "../layouts/Layout.astro";
+import background from "../assets/background.svg";
 
 // Импортим все JPG из папки assets (eager чтобы сразу получить URL)
-const modules = import.meta.glob('../assets/*.jpg', { eager: true, as: 'url' });
+const modules = import.meta.glob("../assets/*.jpg", { eager: true, as: "url" });
 
 // Собираем массив { number, title, src }
-const images = Object.entries(modules).map(([path, url]) => {
-  const file = path.split('/').pop();                // e.g. "17-Calavera.jpg"
-  const name = file?.replace(/\.jpg$/, '');           // "17-Calavera"
-  const [number, rawTitle] = name?.split('-', 2) ?? ['', ''];     // ["17", "Calavera"]
-  const title = rawTitle.replace(/_/g, ' ');         // на случай пробелов-черточек
-  return { number, title, src: url };
-}).sort((a, b) => Number(a.number) - Number(b.number));
+const images = Object.entries(modules)
+	.map(([path, url]) => {
+		const file = path.split("/").pop(); // e.g. "17-Calavera.jpg"
+		const name = file?.replace(/\.jpg$/, ""); // "17-Calavera"
+		const [number, rawTitle] = name?.split("-", 2) ?? ["", ""]; // ["17", "Calavera"]
+		const title = rawTitle.replace(/_/g, " "); // на случай пробелов-черточек
+		return { number, title, src: url };
+	})
+	.sort((a, b) => Number(a.number) - Number(b.number));
 ---
 
 <Layout>
