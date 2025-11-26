@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import background from "../assets/background.svg";
 
 // Import all JPGs from the assets folder (eager to immediately get their URLs)
-const modules = import.meta.glob("../assets/*.jpg", { eager: true, as: "url" });
+const modules = import.meta.glob<string>("../assets/*.jpg", { eager: true, query: "?url", import: "default" });
 
 // Build array of { number, title, src }
 const images = Object.entries(modules)
