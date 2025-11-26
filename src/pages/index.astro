@@ -2,47 +2,58 @@
 import Layout from "../layouts/Layout.astro";
 import background from "../assets/background.svg";
 
-// Импортим все JPG из папки assets (eager чтобы сразу получить URL)
+// Import all JPGs from the assets folder (eager to immediately get their URLs)
 const modules = import.meta.glob("../assets/*.jpg", { eager: true, as: "url" });
 
-// Собираем массив { number, title, src }
+// Build array of { number, title, src }
 const images = Object.entries(modules)
 	.map(([path, url]) => {
 		const file = path.split("/").pop(); // e.g. "17-Calavera.jpg"
 		const name = file?.replace(/\.jpg$/, ""); // "17-Calavera"
 		const [number, rawTitle] = name?.split("-", 2) ?? ["", ""]; // ["17", "Calavera"]
-		const title = rawTitle.replace(/_/g, " "); // на случай пробелов-черточек
+		const title = rawTitle.replace(/_/g, " ");
 		return { number, title, src: url };
 	})
 	.sort((a, b) => Number(a.number) - Number(b.number));
 ---
 
 <Layout>
-  <img id="background" src={background.src} alt="" fetchpriority="high" />
-  <div class="search-container">
-    <input id="search" type="text" placeholder="По номеру…" />
-  </div>
+	<img id="background" src={background.src} alt="" fetchpriority="high" />
 
-  <div id="gallery">
-    {images.map(image => (
-      <div class="image-card" data-number={image.number}>
-        <img src={image.src} alt={`#${image.number} — ${image.title}`} />
-        <p>#{image.number} — {image.title}</p>
-      </div>
-    ))}
-  </div>
+	<main class="page">
+		<header class="page-header">
+			<h1>Monster Jam Truck Gallery</h1>
+			<p>
+				Browse and search a high-quality gallery of Monster Jam trucks by starting number and
+				name.
+			</p>
+		</header>
 
-  <script is:inline client:load>
-    const input = document.getElementById('search');
-    const cards = document.querySelectorAll('.image-card');
-    input.addEventListener('input', () => {
-      const q = input.value.trim();
-      cards.forEach(card => {
-        const num = card.dataset.number;
-        card.style.display = num.includes(q) ? '' : 'none';
-      });
-    });
-  </script>
+		<div class="search-container">
+			<input id="search" type="text" placeholder="Search by number…" />
+		</div>
+
+		<div id="gallery">
+			{images.map((image) => (
+				<div class="image-card" data-number={image.number}>
+					<img src={image.src} alt={`#${image.number} — ${image.title}`} />
+					<p>#{image.number} — {image.title}</p>
+				</div>
+			))}
+		</div>
+	</main>
+
+	<script is:inline client:load>
+		const input = document.getElementById("search");
+		const cards = document.querySelectorAll(".image-card");
+		input.addEventListener("input", () => {
+			const q = input.value.trim();
+			cards.forEach((card) => {
+				const num = card.dataset.number;
+				card.style.display = num.includes(q) ? "" : "none";
+			});
+		});
+	</script>
 </Layout>
 
 
@@ -57,91 +68,121 @@ const images = Object.entries(modules)
 		filter: blur(100px);
 	}
 
-	/* фон и прочие глобалки оставляем без изменений… */
+	.page {
+		position: relative;
+		padding-top: 3rem;
+	}
 
-.search-container {
-  display: flex;
-  justify-content: center;
-  margin: 2rem 0 1rem;
-  padding: 0 1.5rem 2rem;
-}
-#search {
-  width: 100%;
-  max-width: 360px;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border-radius: 9999px;
-  border: 2px solid rgba(0,0,0,0.1);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-#search:focus {
-  outline: none;
-  border-color: #6b46c1;
-  box-shadow: 0 4px 12px rgba(107,70,193,0.2);
-}
+	.page-header {
+		text-align: center;
+		color: #1a202c;
+		padding: 2.5rem 1.5rem 0.5rem;
+	}
 
-/* responsive gallery */
-#gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1.5rem;
-  padding: 0 1.5rem 2rem;
-}
-.image-card {
-  display: flex;
-  flex-direction: column;
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.image-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-}
+	.page-header h1 {
+		margin: 0 0 0.5rem;
+		font-size: 2rem;
+		font-weight: 800;
+		letter-spacing: 0.03em;
+	}
 
-/* сам контейнер картинки — пусть растягивается по ширине, а высота определяется пропорциями */
-.image-card img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
+	.page-header p {
+		margin: 0;
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+		font-size: 0.95rem;
+		color: #4a5568;
+	}
 
-/* подпись приклеиваем к низу карточки */
-.image-card p {
-  margin: 0;
-  flex: 1;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #6b46c1 0%, #b794f4 100%);
-  color: white;
-  display: block;
-  width: 100%;                /* чтобы бэдж занимал всю ширину карточки */
-  box-sizing: border-box;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-.image-card:hover p {
-  background: linear-gradient(135deg, #5a3ea1 0%, #9f7aea 100%);
-}
+	.search-container {
+		display: flex;
+		justify-content: center;
+		margin: 2rem 0 1rem;
+		padding: 0 1.5rem 2rem;
+	}
 
-/* mobile tweaks */
-@media (max-width: 480px) {
-  #search {
-    max-width: 95%;
-  }
-  #gallery {
-    gap: 1rem;
-    padding: 0 1rem 1.5rem;
-  }
-  .search-container {
-	padding: 0 1rem 1.5rem;
-  }
-}
+	#search {
+		width: 100%;
+		max-width: 360px;
+		padding: 0.75rem 1rem;
+		font-size: 1rem;
+		border-radius: 9999px;
+		border: 2px solid rgba(0, 0, 0, 0.1);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+		transition: border-color 0.2s, box-shadow 0.2s;
+	}
+
+	#search:focus {
+		outline: none;
+		border-color: #6b46c1;
+		box-shadow: 0 4px 12px rgba(107, 70, 193, 0.2);
+	}
+
+	/* responsive gallery */
+	#gallery {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 1.5rem;
+		padding: 0 1.5rem 2rem;
+	}
+
+	.image-card {
+		display: flex;
+		flex-direction: column;
+		background: white;
+		border-radius: 12px;
+		overflow: hidden;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+		transition: transform 0.2s, box-shadow 0.2s;
+	}
+
+	.image-card:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+	}
+
+	.image-card img {
+		width: 100%;
+		height: auto;
+		display: block;
+	}
+
+	.image-card p {
+		margin: 0;
+		flex: 1;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.875rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		background: linear-gradient(135deg, #6b46c1 0%, #b794f4 100%);
+		color: white;
+		display: block;
+		width: 100%;
+		box-sizing: border-box;
+		border-bottom-left-radius: 12px;
+		border-bottom-right-radius: 12px;
+	}
+
+	.image-card:hover p {
+		background: linear-gradient(135deg, #5a3ea1 0%, #9f7aea 100%);
+	}
+
+	/* mobile tweaks */
+	@media (max-width: 480px) {
+		#search {
+			max-width: 95%;
+		}
+
+		#gallery {
+			gap: 1rem;
+			padding: 0 1rem 1.5rem;
+		}
+
+		.search-container {
+			padding: 0 1rem 1.5rem;
+		}
+	}
 
 </style>
