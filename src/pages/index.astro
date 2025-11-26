@@ -43,16 +43,18 @@ const images = Object.entries(modules)
 		</div>
 	</main>
 
-	<script is:inline client:load>
+	<script is:inline>
 		const input = document.getElementById("search");
 		const cards = document.querySelectorAll(".image-card");
-		input.addEventListener("input", () => {
-			const q = input.value.trim();
-			cards.forEach((card) => {
-				const num = card.dataset.number;
-				card.style.display = num.includes(q) ? "" : "none";
+		if (input) {
+			input.addEventListener("input", () => {
+				const q = input.value.trim();
+				cards.forEach((card) => {
+					const num = card.dataset.number ?? "";
+					card.style.display = num.includes(q) ? "" : "none";
+				});
 			});
-		});
+		}
 	</script>
 </Layout>
 
@@ -65,25 +67,32 @@ const images = Object.entries(modules)
 		width: 100%;
 		height: 100%;
 		z-index: -1;
-		filter: blur(100px);
+		filter: blur(90px);
+		transform: scale(1.05);
+		opacity: 0.9;
+		pointer-events: none;
 	}
 
 	.page {
 		position: relative;
 		padding-top: 3rem;
+		min-height: 100vh;
+		backdrop-filter: blur(10px);
 	}
 
 	.page-header {
 		text-align: center;
-		color: #1a202c;
 		padding: 2.5rem 1.5rem 0.5rem;
+		color: #111827;
 	}
 
 	.page-header h1 {
-		margin: 0 0 0.5rem;
-		font-size: 2rem;
+		margin: 0 0 0.65rem;
+		font-size: 2.2rem;
 		font-weight: 800;
-		letter-spacing: 0.03em;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: #111827;
 	}
 
 	.page-header p {
@@ -91,32 +100,47 @@ const images = Object.entries(modules)
 		max-width: 640px;
 		margin-left: auto;
 		margin-right: auto;
-		font-size: 0.95rem;
-		color: #4a5568;
+		font-size: 0.98rem;
+		color: #4b5563;
 	}
 
 	.search-container {
 		display: flex;
 		justify-content: center;
-		margin: 2rem 0 1rem;
+		margin: 2rem 0 1.5rem;
 		padding: 0 1.5rem 2rem;
 	}
 
 	#search {
 		width: 100%;
-		max-width: 360px;
-		padding: 0.75rem 1rem;
+		max-width: 420px;
+		padding: 0.8rem 1.1rem;
 		font-size: 1rem;
 		border-radius: 9999px;
-		border: 2px solid rgba(0, 0, 0, 0.1);
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-		transition: border-color 0.2s, box-shadow 0.2s;
+		border: 1px solid rgba(15, 23, 42, 0.18);
+		background: rgba(255, 255, 255, 0.9);
+		box-shadow:
+			0 10px 40px rgba(15, 23, 42, 0.18),
+			0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+		transition:
+			border-color 160ms ease-out,
+			box-shadow 160ms ease-out,
+			transform 120ms ease-out,
+			background-color 160ms ease-out;
+	}
+
+	#search::placeholder {
+		color: rgba(100, 116, 139, 0.8);
 	}
 
 	#search:focus {
 		outline: none;
-		border-color: #6b46c1;
-		box-shadow: 0 4px 12px rgba(107, 70, 193, 0.2);
+		border-color: rgba(59, 130, 246, 0.9);
+		box-shadow:
+			0 14px 46px rgba(59, 130, 246, 0.18),
+			0 0 0 1px rgba(255, 255, 255, 0.85) inset;
+		transform: translateY(-1px);
+		background: rgba(255, 255, 255, 1);
 	}
 
 	/* responsive gallery */
@@ -124,64 +148,119 @@ const images = Object.entries(modules)
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 		gap: 1.5rem;
-		padding: 0 1.5rem 2rem;
+		padding: 0 1.5rem 2.5rem;
+	}
+
+	/* limit card max-width on medium+ screens so single result doesn't stretch */
+	@media (min-width: 640px) {
+		.image-card {
+			max-width: 320px;
+		}
 	}
 
 	.image-card {
 		display: flex;
 		flex-direction: column;
-		background: white;
-		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.96);
+		border-radius: 16px;
 		overflow: hidden;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-		transition: transform 0.2s, box-shadow 0.2s;
-	}
-
-	.image-card:hover {
-		transform: translateY(-4px);
-		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+		box-shadow:
+			0 6px 26px rgba(15, 23, 42, 0.16),
+			0 0 0 1px rgba(255, 255, 255, 0.7);
+		transform-origin: center center;
 	}
 
 	.image-card img {
 		width: 100%;
 		height: auto;
 		display: block;
+		transition: transform 200ms ease-out;
 	}
 
 	.image-card p {
 		margin: 0;
 		flex: 1;
-		padding: 0.5rem 0.75rem;
-		font-size: 0.875rem;
-		font-weight: 600;
+		padding: 0.55rem 0.9rem;
+		font-size: 0.86rem;
+		font-weight: 650;
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
-		background: linear-gradient(135deg, #6b46c1 0%, #b794f4 100%);
+		letter-spacing: 0.55px;
+		background: linear-gradient(135deg, #1d4ed8 0%, #6d28d9 40%, #f97316 100%);
 		color: white;
 		display: block;
 		width: 100%;
 		box-sizing: border-box;
-		border-bottom-left-radius: 12px;
-		border-bottom-right-radius: 12px;
+		border-bottom-left-radius: 16px;
+		border-bottom-right-radius: 16px;
+		transition: background-position 220ms ease-out;
+		background-size: 160%;
+		background-position: 0% 50%;
+	}
+
+	.image-card:hover img {
+		transform: scale(1.04) translateY(-1px);
 	}
 
 	.image-card:hover p {
-		background: linear-gradient(135deg, #5a3ea1 0%, #9f7aea 100%);
+		background-position: 100% 50%;
+	}
+
+	/* scroll-driven reveal — pure CSS (Chrome 115+, Edge 115+, Safari 18+) */
+	@keyframes card-reveal {
+		0% {
+			transform: translateY(24px) scale(0.96);
+		}
+		100% {
+			transform: translateY(0) scale(1);
+		}
+	}
+
+	@supports (animation-timeline: view()) {
+		.image-card {
+			view-timeline-name: --card;
+			view-timeline-axis: block;
+			animation: card-reveal linear both;
+			animation-timeline: view();
+			animation-range: entry 0% entry 100%;
+		}
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		#background {
+			animation: floatBackground 18s ease-in-out infinite alternate;
+		}
+	}
+
+	@keyframes floatBackground {
+		from {
+			transform: translate3d(0, 0, 0) scale(1.02);
+		}
+		to {
+			transform: translate3d(0, -12px, 0) scale(1.08) rotate(0.6deg);
+		}
 	}
 
 	/* mobile tweaks */
 	@media (max-width: 480px) {
 		#search {
 			max-width: 95%;
+			box-shadow:
+				0 8px 30px rgba(15, 23, 42, 0.16),
+				0 0 0 1px rgba(255, 255, 255, 0.7) inset;
 		}
 
 		#gallery {
-			gap: 1rem;
-			padding: 0 1rem 1.5rem;
+			gap: 1.05rem;
+			padding: 0 1rem 1.9rem;
 		}
 
 		.search-container {
-			padding: 0 1rem 1.5rem;
+			padding: 0 1rem 1.7rem;
+			margin-top: 1.5rem;
+		}
+
+		.page-header h1 {
+			font-size: 1.8rem;
 		}
 	}
 
