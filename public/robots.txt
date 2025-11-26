@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mmj-finder.com/sitemap.xml
+
+
